@@ -1,209 +1,135 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { useRouter } from 'next/router';
-import React, { ReactElement, useState } from 'react';
-import { encodePassphrase, generateRoomId, randomString } from '../lib/client-utils';
+import React, { useState } from 'react';
 import styles from '../styles/Home.module.css';
 
-interface TabsProps {
-  children: ReactElement[];
-  selectedIndex?: number;
-  onTabSelected?: (index: number) => void;
+function LoginModal({ onClose }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Logged in successfully with token:', data.token);
+        onClose();
+      } else {
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  return (
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <span className={styles.close} onClick={onClose}>&times;</span>
+        <h2>Login</h2>
+        <input type="text" className={styles.inputFields} placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+        <input type="password" className={styles.inputFields} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+        <button className={`${styles.button}`} onClick={handleLogin}>Login</button>
+      </div>
+    </div>
+  );
 }
 
-function Tabs(props: TabsProps) {
-  const activeIndex = props.selectedIndex ?? 0;
-  if (!props.children) {
-    return <></>;
-  }
-
-  let tabs = React.Children.map(props.children, (child, index) => {
-    return (
-      <button
-        className="lk-button"
-        onClick={() => {
-          if (props.onTabSelected) props.onTabSelected(index);
-        }}
-        aria-pressed={activeIndex === index}
-      >
-        {child?.props.label}
-      </button>
-    );
+function SignupModal({ onClose }) {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    firstname: '',
+    lastname: '',
+    email: '',
+    phone_number: '',
+    group_id: '',
+    is_professor: false,
+    is_admin: false,
+    sex: '',
+    birthdate: ''
   });
-  return (
-    <div className={styles.tabContainer}>
-      <div className={styles.tabSelect}>{tabs}</div>
-      {props.children[activeIndex]}
-    </div>
-  );
-}
 
-function DemoMeetingTab({ label }: { label: string }) {
-  const router = useRouter();
-  const [e2ee, setE2ee] = useState(false);
-  const [sharedPassphrase, setSharedPassphrase] = useState(randomString(64));
-  const startMeeting = () => {
-    if (e2ee) {
-      router.push(`/rooms/${generateRoomId()}#${encodePassphrase(sharedPassphrase)}`);
-    } else {
-      router.push(`/rooms/${generateRoomId()}`);
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        console.log('Signed up successfully');
+        onClose();
+      } else {
+        console.error('Signup failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
+
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : (name === 'group_id' ? parseInt(value, 10) : value); // Convert group_id to number if applicable
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: newValue
+    }));
+  };
+  
+
   return (
-    <div className={styles.tabContent}>
-      <p style={{ margin: 0 }}>Try LiveKit Meet for free with our live demo project.</p>
-      <button style={{ marginTop: '1rem' }} className="lk-button" onClick={startMeeting}>
-        Start Meeting
-      </button>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <input
-            id="use-e2ee"
-            type="checkbox"
-            checked={e2ee}
-            onChange={(ev) => setE2ee(ev.target.checked)}
-          ></input>
-          <label htmlFor="use-e2ee">Enable end-to-end encryption</label>
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <span className={styles.close} onClick={onClose}>&times;</span>
+        <h2>Sign Up</h2>
+        <input type="text" className={styles.inputFields} name="username" placeholder="Username" value={formData.username} onChange={handleChange} />
+        <input type="password" className={styles.inputFields} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
+        <input type="text" className={styles.inputFields} name="firstname" placeholder="First Name" value={formData.firstname} onChange={handleChange} />
+        <input type="text" className={styles.inputFields} name="lastname" placeholder="Last Name" value={formData.lastname} onChange={handleChange} />
+        <input type="email" className={styles.inputFields} name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+        <div className={styles.inputFields}>
+              <label htmlFor="is_professor">Is Professor?</label>
+              <input type="checkbox" name="is_professor" checked={formData.is_professor} onChange={handleChange} />
         </div>
-        {e2ee && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-            <label htmlFor="passphrase">Passphrase</label>
-            <input
-              id="passphrase"
-              type="password"
-              value={sharedPassphrase}
-              onChange={(ev) => setSharedPassphrase(ev.target.value)}
-            />
-          </div>
-        )}
+        <div className={styles.inputFields}>
+              <label htmlFor="is_admin">Is Admin?</label>
+              <input type="checkbox" name="is_admin" checked={formData.is_admin} onChange={handleChange} />
+        </div>
+        <input type="text" className={styles.inputFields} name="phone_number" placeholder="Phone Number" value={formData.phone_number} onChange={handleChange} />
+        <input type="text" className={styles.inputFields} name="group_id" placeholder="Group ID" value={formData.group_id} onChange={handleChange} />
+        <input type="text" className={styles.inputFields} name="sex" placeholder="Sex" value={formData.sex} onChange={handleChange} />
+        <input type="text" className={styles.inputFields} name="birthdate" placeholder="Birthdate: yyyy-mm-ddThh:mm:ssZ" value={formData.birthdate} onChange={handleChange} />
+        <button className={`${styles.button}`} onClick={handleSignup}>Sign Up</button>
       </div>
     </div>
   );
 }
 
-function CustomConnectionTab({ label }: { label: string }) {
-  const router = useRouter();
+const Home = () => {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
-  const [e2ee, setE2ee] = useState(false);
-  const [sharedPassphrase, setSharedPassphrase] = useState(randomString(64));
-
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const serverUrl = formData.get('serverUrl');
-    const token = formData.get('token');
-    if (e2ee) {
-      router.push(
-        `/custom/?liveKitUrl=${serverUrl}&token=${token}#${encodePassphrase(sharedPassphrase)}`,
-      );
-    } else {
-      router.push(`/custom/?liveKitUrl=${serverUrl}&token=${token}`);
-    }
-  };
-  return (
-    <form className={styles.tabContent} onSubmit={onSubmit}>
-      <p style={{ marginTop: 0 }}>
-        Connect LiveKit Meet with a custom server using LiveKit Cloud or LiveKit Server.
-      </p>
-      <input
-        id="serverUrl"
-        name="serverUrl"
-        type="url"
-        placeholder="LiveKit Server URL: wss://*.livekit.cloud"
-        required
-      />
-      <textarea
-        id="token"
-        name="token"
-        placeholder="Token"
-        required
-        rows={5}
-        style={{ padding: '1px 2px', fontSize: 'inherit', lineHeight: 'inherit' }}
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <input
-            id="use-e2ee"
-            type="checkbox"
-            checked={e2ee}
-            onChange={(ev) => setE2ee(ev.target.checked)}
-          ></input>
-          <label htmlFor="use-e2ee">Enable end-to-end encryption</label>
-        </div>
-        {e2ee && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-            <label htmlFor="passphrase">Passphrase</label>
-            <input
-              id="passphrase"
-              type="password"
-              value={sharedPassphrase}
-              onChange={(ev) => setSharedPassphrase(ev.target.value)}
-            />
-          </div>
-        )}
-      </div>
-
-      <hr
-        style={{ width: '100%', borderColor: 'rgba(255, 255, 255, 0.15)', marginBlock: '1rem' }}
-      />
-      <button
-        style={{ paddingInline: '1.25rem', width: '100%' }}
-        className="lk-button"
-        type="submit"
-      >
-        Connect
-      </button>
-    </form>
-  );
-}
-
-export const getServerSideProps: GetServerSideProps<{ tabIndex: number }> = async ({
-  query,
-  res,
-}) => {
-  res.setHeader('Cache-Control', 'public, max-age=7200');
-  const tabIndex = query.tab === 'custom' ? 1 : 0;
-  return { props: { tabIndex } };
-};
-
-const Home = ({ tabIndex }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter();
-  function onTabSelected(index: number) {
-    const tab = index === 1 ? 'custom' : 'demo';
-    router.push({ query: { tab } });
-  }
   return (
     <>
-      <main className={styles.main} data-lk-theme="default">
-        <div className="header">
-          <img src="/images/livekit-meet-home.svg" alt="LiveKit Meet" width="360" height="45" />
-          <h2>
-            Open source video conferencing app built on{' '}
-            <a href="https://github.com/livekit/components-js?ref=meet" rel="noopener">
-              LiveKit&nbsp;Components
-            </a>
-            ,{' '}
-            <a href="https://livekit.io/cloud?ref=meet" rel="noopener">
-              LiveKit&nbsp;Cloud
-            </a>{' '}
-            and Next.js.
-          </h2>
+      <div className={styles.canvas}>
+        <div className={styles.authButtons}>
+          <button className={`${styles.button}`} onClick={() => { setShowSignupModal(true); setShowLoginModal(false); }}>Sign Up</button>
+          <button className={`${styles.button}`} onClick={() => { setShowLoginModal(true); setShowSignupModal(false); }}>Login</button>
         </div>
-        <Tabs selectedIndex={tabIndex} onTabSelected={onTabSelected}>
-          <DemoMeetingTab label="Demo" />
-          <CustomConnectionTab label="Custom" />
-        </Tabs>
-      </main>
-      <footer data-lk-theme="default">
-        Hosted on{' '}
-        <a href="https://livekit.io/cloud?ref=meet" rel="noopener">
-          LiveKit Cloud
-        </a>
-        . Source code on{' '}
-        <a href="https://github.com/livekit/meet?ref=meet" rel="noopener">
-          GitHub
-        </a>
-        .
-      </footer>
+      </div>
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {showSignupModal && <SignupModal onClose={() => setShowSignupModal(false)} />}
     </>
   );
 };
