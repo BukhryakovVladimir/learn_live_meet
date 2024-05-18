@@ -8,6 +8,16 @@ interface Subject {
   subject_name: string;
 }
 
+interface Student {
+  ID: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  group_id: number;
+  sex: string;
+  birthdate: string;
+}
+
 interface GradeAttendance {
   id: number;
   student_id: number;
@@ -38,6 +48,8 @@ const StudentsOfGroup: React.FC = () => {
   const { groupId } = router.query;
   const [isProfessor, setIsProfessor] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [gradesAndAttendance, setGradesAndAttendance] = useState<GradeAttendance[]>([]);
   const [semesterGrades, setSemesterGrades] = useState<SemesterGrade[]>([]);
@@ -46,7 +58,7 @@ const StudentsOfGroup: React.FC = () => {
   );
 
   useEffect(() => {
-    const fetchUserRoleAndSubjects = async () => {
+    const fetchUserRoleAndStudents = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
           method: 'GET',
@@ -58,17 +70,17 @@ const StudentsOfGroup: React.FC = () => {
         setIsProfessor(data.is_professor);
 
         if (groupId) {
-          fetchSubjectsOfGroup(groupId as string);
+          fetchStudentsOfGroup(groupId as string);
         }
       } catch (error) {
-        console.error('Error fetching user role or subjects:', error);
+        console.error('Error fetching user role or students:', error);
       }
     };
 
-    const fetchSubjectsOfGroup = async (groupId: string) => {
+    const fetchStudentsOfGroup = async (groupId: string) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/list-subjects-of-a-student?student_id=${groupId}`,
+          `http://localhost:3000/api/list-students-of-a-group?group_id=${groupId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -77,23 +89,50 @@ const StudentsOfGroup: React.FC = () => {
         );
 
         const data = await response.json();
-        setSubjects(data);
+        setStudents(data);
         if (data.length > 0) {
-          setSelectedSubjectId(data[0].id);
+          setSelectedStudentId(data[0].ID);
         }
       } catch (error) {
-        console.error('Error fetching subjects:', error);
+        console.error('Error fetching students:', error);
       }
     };
 
-    fetchUserRoleAndSubjects();
+    fetchUserRoleAndStudents();
   }, [groupId]);
 
-  const fetchGradesAndAttendance = async (subjectId: number) => {
-    if (!groupId) return;
+  useEffect(() => {
+    if (selectedStudentId !== null) {
+      fetchSubjectsOfStudent(selectedStudentId);
+    }
+  }, [selectedStudentId]);
+
+  const fetchSubjectsOfStudent = async (studentId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/list-grades-and-attendance-of-a-student-by-subject?student_id=${groupId}&subject_id=${subjectId}`,
+        `http://localhost:3000/api/list-subjects-of-a-student?student_id=${studentId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        },
+      );
+
+      const data = await response.json();
+      setSubjects(data);
+      if (data.length > 0) {
+        setSelectedSubjectId(data[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+    }
+  };
+
+  const fetchGradesAndAttendance = async (subjectId: number) => {
+    if (!selectedStudentId) return;
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/list-grades-and-attendance-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -109,10 +148,10 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const fetchSemesterGrades = async (subjectId: number) => {
-    if (!groupId) return;
+    if (!selectedStudentId) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/api/list-total-grades-of-a-student-by-subject?student_id=${groupId}&subject_id=${subjectId}`,
+        `http://localhost:3000/api/list-total-grades-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -138,7 +177,7 @@ const StudentsOfGroup: React.FC = () => {
   }, [selectedSubjectId, currentView]);
 
   const handleAddGradeAttendance = async () => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
           'http://localhost:3000/api/insert-grade-and-attendance-of-a-student',
@@ -147,7 +186,7 @@ const StudentsOfGroup: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({
-              student_id: groupId,
+              student_id: selectedStudentId,
               subject_id: selectedSubjectId,
               grade: 1,
               has_attended: true,
@@ -165,7 +204,7 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const handleUpdateGradeAttendance = async (id: number) => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
           'http://localhost:3000/api/update-grade-and-attendance-of-a-student',
@@ -175,7 +214,7 @@ const StudentsOfGroup: React.FC = () => {
             credentials: 'include',
             body: JSON.stringify({
               id,
-              student_id: groupId,
+              student_id: selectedStudentId,
               subject_id: selectedSubjectId,
               grade: 4,
               has_attended: true,
@@ -193,10 +232,10 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const handleDeleteGradeAttendance = async (id: number) => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/delete-grade-and-attendance-of-a-student?id=${id}&student_id=${groupId}&subject_id=${selectedSubjectId}`,
+          `http://localhost:3000/api/delete-grade-and-attendance-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
           {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
@@ -214,13 +253,17 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const handleAddSemesterGrade = async () => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch('http://localhost:3000/api/insert-total-grade-of-a-student', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ student_id: groupId, subject_id: selectedSubjectId, grade: 'A' }),
+          body: JSON.stringify({
+            student_id: selectedStudentId,
+            subject_id: selectedSubjectId,
+            grade: 'A',
+          }),
         });
 
         if (response.ok) {
@@ -233,7 +276,7 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const handleUpdateSemesterGrade = async (id: number) => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch('http://localhost:3000/api/update-total-grade-of-a-student', {
           method: 'PUT',
@@ -241,7 +284,7 @@ const StudentsOfGroup: React.FC = () => {
           credentials: 'include',
           body: JSON.stringify({
             id,
-            student_id: groupId,
+            student_id: selectedStudentId,
             subject_id: selectedSubjectId,
             grade: 'B',
           }),
@@ -257,10 +300,10 @@ const StudentsOfGroup: React.FC = () => {
   };
 
   const handleDeleteSemesterGrade = async (id: number) => {
-    if (isProfessor && selectedSubjectId !== null && groupId) {
+    if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/delete-total-grade-of-a-student?id=${id}&student_id=${groupId}&subject_id=${selectedSubjectId}`,
+          `http://localhost:3000/api/delete-total-grade-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
           {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
@@ -347,6 +390,20 @@ const StudentsOfGroup: React.FC = () => {
       <Header />
       <div className={studentsGroupStyles.container}>
         <h1>Students of group {groupId}</h1>
+        <div>
+          <label htmlFor="student-select">Select student:</label>
+          <select
+            id="student-select"
+            value={selectedStudentId || ''}
+            onChange={(e) => setSelectedStudentId(Number(e.target.value))}
+          >
+            {students.map((student) => (
+              <option key={student.ID} value={student.ID}>
+                {student.firstName} {student.lastName}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label htmlFor="subject-select">Select subject:</label>
           <select
