@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import roomsStyles from '../../styles/Rooms.module.css';
 import Header from '../components/Header';
+import config from '../../config/config';
 
 interface Room {
   id: number;
@@ -23,7 +24,7 @@ const Rooms: React.FC = () => {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -41,7 +42,7 @@ const Rooms: React.FC = () => {
     const fetchRooms = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/list-rooms-of-a-subject?subject_id=${subjectId}`,
+          `http://${config.serverIP}:3000/api/list-rooms-of-a-subject?subject_id=${subjectId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -67,7 +68,7 @@ const Rooms: React.FC = () => {
   const handleAddRoom = async () => {
     try {
       const parsedSubjectId = parseInt(subjectId);
-      const response = await fetch('http://localhost:3000/api/add-room', {
+      const response = await fetch(`http://${config.serverIP}:3000/api/add-room`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -87,7 +88,7 @@ const Rooms: React.FC = () => {
   const handleUpdateRoom = async () => {
     if (editRoomId !== null) {
       try {
-        const response = await fetch('http://localhost:3000/api/update-room', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/update-room`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -108,7 +109,7 @@ const Rooms: React.FC = () => {
 
   const handleDeleteRoom = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/delete-room?id=${id}`, {
+      const response = await fetch(`http://${config.serverIP}:3000/api/delete-room?id=${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -125,7 +126,7 @@ const Rooms: React.FC = () => {
 
   const handleRoomClick = async (roomId: number, router: any) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/get-token?room_id=${roomId}`, {
+      const response = await fetch(`http://${config.serverIP}:3000/api/get-token?room_id=${roomId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -136,7 +137,7 @@ const Rooms: React.FC = () => {
         console.log('Token:', token);
   
         if (token) {
-          const serverUrl = 'ws://localhost:7880';
+          const serverUrl = `ws://${config.serverIP}:7880`;
           console.log(`/custom/?liveKitUrl=${serverUrl}&token=${token}`);
           router.push(`/custom/?liveKitUrl=${serverUrl}&token=${token}`);
         } else {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import subjectsStyles from '../styles/Subjects.module.css';
 import Header from './components/Header';
 import Link from 'next/link';
+import config from '../config/config';
 
 interface Subject {
   id: number;
@@ -19,7 +20,7 @@ const Subjects: React.FC = () => {
   useEffect(() => {
     const checkUserRole = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -30,9 +31,9 @@ const Subjects: React.FC = () => {
         setIsProfessor(data.is_professor);
 
         if (data.is_admin) {
-          fetchSubjects('http://localhost:3000/api/list-subjects');
+          fetchSubjects(`http://${config.serverIP}:3000/api/list-subjects`);
         } else {
-          fetchSubjects('http://localhost:3000/api/list-current-user-subjects');
+          fetchSubjects(`http://${config.serverIP}:3000/api/list-current-user-subjects`);
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -59,7 +60,7 @@ const Subjects: React.FC = () => {
 
   const handleAddSubject = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/add-subject', {
+      const response = await fetch(`http://${config.serverIP}:3000/api/add-subject`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -80,7 +81,7 @@ const Subjects: React.FC = () => {
   const handleUpdateSubject = async () => {
     if (editSubjectId !== null) {
       try {
-        const response = await fetch('http://localhost:3000/api/update-subject', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/update-subject`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -102,7 +103,7 @@ const Subjects: React.FC = () => {
 
   const handleDeleteSubject = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/delete-subject?id=${id}`, {
+      const response = await fetch(`http://${config.serverIP}:3000/api/delete-subject?id=${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

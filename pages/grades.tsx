@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import style from '../styles/Grades.module.css';
+import config from '../config/config';
 
 interface Subject {
   id: number;
@@ -24,7 +25,7 @@ const Grades: React.FC = () => {
   useEffect(() => {
     const checkUserRole = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -44,7 +45,7 @@ const Grades: React.FC = () => {
     const fetchSubjects = async () => {
       if (!isAdmin && !isProfessor) {
         try {
-          const response = await fetch('http://localhost:3000/api/list-current-user-subjects', {
+          const response = await fetch(`http://${config.serverIP}:3000/api/list-current-user-subjects`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -67,7 +68,7 @@ const Grades: React.FC = () => {
     const fetchGradesAndAttendance = async (subjectId: number) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/list-current-user-grades-and-attendance-by-subject?subject_id=${subjectId}`,
+          `http://${config.serverIP}:3000/api/list-current-user-grades-and-attendance-by-subject?subject_id=${subjectId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },

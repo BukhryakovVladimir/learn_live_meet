@@ -7,7 +7,7 @@ const Home: React.FC = () => {
     <div className={styles.canvas}>
       <Header />
       <div className={styles.main}>
-        <h1>Welcome to the Home Page</h1>
+        <h1>Добро пожаловать!</h1>
       </div>
     </div>
   );

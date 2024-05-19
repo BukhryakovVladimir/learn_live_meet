@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/Header.module.css';
+import config from '../../config/config';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
@@ -17,7 +18,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const checkAdminOrProfessor = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -43,7 +44,7 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     // Clear the JWT cookie
-    document.cookie = "learn_live_jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api; domain=localhost;";
+    document.cookie = `learn_live_jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/api; domain=${config.serverIP};`;
     setIsLoggedIn(false);
     setIsAdmin(false);
     window.location.reload(); // Reload using window.location

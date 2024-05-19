@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from '../../styles/Header.module.css';
+import config from '../../config/config';
 
 const LoginModal = ({ onClose }: { onClose: () => void }) => {
   const [username, setUsername] = useState('');
@@ -7,7 +8,7 @@ const LoginModal = ({ onClose }: { onClose: () => void }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch(`http://${config.serverIP}:3000/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

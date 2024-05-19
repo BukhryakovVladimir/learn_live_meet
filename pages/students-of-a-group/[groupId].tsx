@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import studentsGroupStyles from '../../styles/StudentsGroup.module.css';
 import Header from '../components/Header';
+import config from '../../config/config';
 
 interface Subject {
   id: number;
@@ -70,7 +71,7 @@ const StudentsOfGroup: React.FC = () => {
   useEffect(() => {
     const fetchUserRoleAndStudents = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -90,7 +91,7 @@ const StudentsOfGroup: React.FC = () => {
     const fetchStudentsOfGroup = async (groupId: string) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/list-students-of-a-group?group_id=${groupId}`,
+          `http://${config.serverIP}:3000/api/list-students-of-a-group?group_id=${groupId}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -120,7 +121,7 @@ const StudentsOfGroup: React.FC = () => {
   const fetchSubjectsOfStudent = async (studentId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/list-subjects-of-a-student?student_id=${studentId}`,
+        `http://${config.serverIP}:3000/api/list-subjects-of-a-student?student_id=${studentId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -142,7 +143,7 @@ const StudentsOfGroup: React.FC = () => {
     if (!selectedStudentId) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/api/list-grades-and-attendance-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
+        `http://${config.serverIP}:3000/api/list-grades-and-attendance-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -161,7 +162,7 @@ const StudentsOfGroup: React.FC = () => {
     if (!selectedStudentId) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/api/list-total-grades-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
+        `http://${config.serverIP}:3000/api/list-total-grades-of-a-student-by-subject?student_id=${selectedStudentId}&subject_id=${subjectId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -190,7 +191,7 @@ const StudentsOfGroup: React.FC = () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          'http://localhost:3000/api/insert-grade-and-attendance-of-a-student',
+          `http://${config.serverIP}:3000/api/insert-grade-and-attendance-of-a-student`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -219,7 +220,7 @@ const StudentsOfGroup: React.FC = () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          'http://localhost:3000/api/update-grade-and-attendance-of-a-student',
+          `http://${config.serverIP}:3000/api/update-grade-and-attendance-of-a-student`,
           {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -250,7 +251,7 @@ const StudentsOfGroup: React.FC = () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/delete-grade-and-attendance-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
+          `http://${config.serverIP}:3000/api/delete-grade-and-attendance-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
           {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
@@ -270,7 +271,7 @@ const StudentsOfGroup: React.FC = () => {
   const handleAddSemesterGrade = async () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
-        const response = await fetch('http://localhost:3000/api/insert-total-grade-of-a-student', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/insert-total-grade-of-a-student`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -294,7 +295,7 @@ const StudentsOfGroup: React.FC = () => {
   const handleUpdateSemesterGrade = async (id: number) => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
-        const response = await fetch('http://localhost:3000/api/update-total-grade-of-a-student', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/update-total-grade-of-a-student`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -321,7 +322,7 @@ const StudentsOfGroup: React.FC = () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/delete-total-grade-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
+          `http://${config.serverIP}:3000/api/delete-total-grade-of-a-student?id=${id}&student_id=${selectedStudentId}&subject_id=${selectedSubjectId}`,
           {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },

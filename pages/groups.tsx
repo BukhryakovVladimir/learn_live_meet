@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import groupsStyles from '../styles/Groups.module.css';
 import Header from './components/Header';
+import config from '../config/config';
 
 interface Group {
   id: number;
@@ -19,7 +20,7 @@ const Groups: React.FC = () => {
   useEffect(() => {
     const checkUserRole = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/check-is-admin-or-professor', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -28,7 +29,7 @@ const Groups: React.FC = () => {
         const data = await response.json();
         setIsAdmin(data.is_admin);
 
-        fetchGroups('http://localhost:3000/api/list-groups');
+        fetchGroups(`http://${config.serverIP}:3000/api/list-groups`);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
@@ -54,7 +55,7 @@ const Groups: React.FC = () => {
 
   const handleAddGroup = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/add-group', {
+      const response = await fetch(`http://${config.serverIP}:3000/api/add-group`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -75,7 +76,7 @@ const Groups: React.FC = () => {
   const handleUpdateGroup = async () => {
     if (editGroupId !== null) {
       try {
-        const response = await fetch('http://localhost:3000/api/update-group', {
+        const response = await fetch(`http://${config.serverIP}:3000/api/update-group`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -97,7 +98,7 @@ const Groups: React.FC = () => {
 
   const handleDeleteGroup = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/delete-group?id=${id}`, {
+      const response = await fetch(`http://${config.serverIP}:3000/api/delete-group?id=${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

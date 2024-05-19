@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from '../../styles/Header.module.css';
+import config from '../../config/config';
 
 const SignupModal = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
@@ -18,7 +19,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
 
   const handleSignup = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/signup', {
+      const response = await fetch(`http://${config.serverIP}:3000/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
