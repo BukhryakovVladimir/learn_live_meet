@@ -50,10 +50,6 @@ const StudentsOfGroup: React.FC = () => {
   const [editGrade, setEditGrade] = useState(0);
   const [editHasAttended, setEditHasAttended] = useState(true);
 
-  const [newSemesterGrade, setNewSemesterGrade] = useState('');
-  const [editSemesterGradeId, setEditSemesterGradeId] = useState<number | null>(null);
-  const [editSemesterGrade, setEditSemesterGrade] = useState('');
-
   const router = useRouter();
   const { groupId } = router.query;
   const [isProfessor, setIsProfessor] = useState(false);
@@ -203,7 +199,7 @@ const StudentsOfGroup: React.FC = () => {
             }),
           },
         );
-
+  
         if (response.ok) {
           fetchGradesAndAttendance(selectedSubjectId);
           setNewGrade(0); // Reset the new grade input
@@ -214,7 +210,7 @@ const StudentsOfGroup: React.FC = () => {
       }
     }
   };
-
+  
   const handleUpdateGradeAttendance = async (id: number) => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
@@ -233,7 +229,7 @@ const StudentsOfGroup: React.FC = () => {
             }),
           },
         );
-
+  
         if (response.ok) {
           fetchGradesAndAttendance(selectedSubjectId);
           setEditGradeId(null); // Exit edit mode
@@ -245,6 +241,7 @@ const StudentsOfGroup: React.FC = () => {
       }
     }
   };
+  
 
   const handleDeleteGradeAttendance = async (id: number) => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
@@ -277,13 +274,12 @@ const StudentsOfGroup: React.FC = () => {
           body: JSON.stringify({
             student_id: selectedStudentId,
             subject_id: selectedSubjectId,
-            grade: newSemesterGrade,
+            grade: 'A',
           }),
         });
 
         if (response.ok) {
           fetchSemesterGrades(selectedSubjectId);
-          setNewSemesterGrade(''); // Reset the new semester grade input
         }
       } catch (error) {
         console.error('Error adding semester grade:', error);
@@ -302,14 +298,12 @@ const StudentsOfGroup: React.FC = () => {
             id,
             student_id: selectedStudentId,
             subject_id: selectedSubjectId,
-            grade: editSemesterGrade,
+            grade: 'B',
           }),
         });
 
         if (response.ok) {
           fetchSemesterGrades(selectedSubjectId);
-          setEditSemesterGradeId(null); // Exit edit mode
-          setEditSemesterGrade(''); // Reset the edit semester grade input
         }
       } catch (error) {
         console.error('Error updating semester grade:', error);
@@ -340,15 +334,15 @@ const StudentsOfGroup: React.FC = () => {
 
   const renderGradeAttendance = () => {
     if (!gradesAndAttendance || gradesAndAttendance.length === 0) {
-      return <p>Нет оценок</p>;
+      return <p>No grades</p>;
     }
-
+  
     return (
       <ul className={studentsGroupStyles.subjectsList}>
         {gradesAndAttendance.map((grade) => (
           <li key={grade.id} className={studentsGroupStyles.subjectItem}>
-            {grade.student_firstname} {grade.student_lastname} - Оценка: {grade.grade}, Присутствие:{' '}
-            {grade.has_attended ? '+' : '-'}
+            {grade.student_firstname} {grade.student_lastname} - Grade: {grade.grade}, Attended:{' '}
+            {grade.has_attended ? 'Yes' : 'No'}
             {isProfessor && (
               <div className={studentsGroupStyles.subjectActions}>
                 <button
@@ -359,13 +353,13 @@ const StudentsOfGroup: React.FC = () => {
                   }}
                   className={studentsGroupStyles.subjectButton}
                 >
-                  Изменить
+                  Update
                 </button>
                 <button
                   onClick={() => handleDeleteGradeAttendance(grade.id)}
                   className={studentsGroupStyles.subjectButton}
                 >
-                  Удалить
+                  Delete
                 </button>
               </div>
             )}
@@ -374,33 +368,31 @@ const StudentsOfGroup: React.FC = () => {
       </ul>
     );
   };
+  
 
   const renderSemesterGrades = () => {
     if (!semesterGrades || semesterGrades.length === 0) {
-      return <p>Нет оценок</p>;
+      return <p>No grades</p>;
     }
 
     return (
       <ul className={studentsGroupStyles.subjectsList}>
         {semesterGrades.map((grade) => (
           <li key={grade.id} className={studentsGroupStyles.subjectItem}>
-            {grade.student_firstname} {grade.student_lastname} - Оценка: {grade.grade}
+            {grade.student_firstname} {grade.student_lastname} - Grade: {grade.grade}
             {isProfessor && (
               <div className={studentsGroupStyles.subjectActions}>
                 <button
-                  onClick={() => {
-                    setEditSemesterGradeId(grade.id);
-                    setEditSemesterGrade(grade.grade);
-                  }}
+                  onClick={() => handleUpdateSemesterGrade(grade.id)}
                   className={studentsGroupStyles.subjectButton}
                 >
-                  Изменить
+                  Update
                 </button>
                 <button
                   onClick={() => handleDeleteSemesterGrade(grade.id)}
                   className={studentsGroupStyles.subjectButton}
                 >
-                  Удалить
+                  Delete
                 </button>
               </div>
             )}
@@ -414,28 +406,23 @@ const StudentsOfGroup: React.FC = () => {
     <>
       <Header />
       <div className={studentsGroupStyles.container}>
-        <h1>Студенты группы: {groupId}</h1>
+        <h1>Students of group {groupId}</h1>
         <div>
-          <label htmlFor="student-select">Студент:</label>
+          <label htmlFor="student-select">Select student:</label>
           <select
             id="student-select"
             value={selectedStudentId || ''}
             onChange={(e) => setSelectedStudentId(Number(e.target.value))}
           >
-            {students &&
-              students.map(
-                (
-                  student, // Add a check to ensure `students` is an array
-                ) => (
-                  <option key={student.ID} value={student.ID}>
-                    {student.firstName} {student.lastName}
-                  </option>
-                ),
-              )}
+            {students.map((student) => (
+              <option key={student.ID} value={student.ID}>
+                {student.firstName} {student.lastName}
+              </option>
+            ))}
           </select>
         </div>
         <div>
-          <label htmlFor="subject-select">Дисциплина:</label>
+          <label htmlFor="subject-select">Select subject:</label>
           <select
             id="subject-select"
             value={selectedSubjectId || ''}
@@ -450,13 +437,13 @@ const StudentsOfGroup: React.FC = () => {
         </div>
         <div>
           <button onClick={() => setCurrentView('grades-and-attendance')}>
-            Оценки и посещаемость
+            Grades and Attendance
           </button>
-          <button onClick={() => setCurrentView('semester-grades')}>Оценки за семестры</button>
+          <button onClick={() => setCurrentView('semester-grades')}>Semester Grades</button>
         </div>
         {currentView === 'grades-and-attendance' ? (
           <div>
-            <h2>Оценки и посещаемость</h2>
+            <h2>Grades and Attendance</h2>
             {renderGradeAttendance()}
             {isProfessor && (
               <>
@@ -464,21 +451,17 @@ const StudentsOfGroup: React.FC = () => {
                   type="number"
                   value={newGrade}
                   onChange={(e) => setNewGrade(Number(e.target.value))}
-                  className={studentsGroupStyles.inputField}
-                  placeholder="Оценка"
+                  placeholder="Grade"
                 />
                 <select
                   value={newHasAttended}
                   onChange={(e) => setNewHasAttended(e.target.value === 'true')}
                 >
-                  <option value="true">Присутствует</option>
-                  <option value="false">Отсутствует</option>
+                  <option value="true">Attended</option>
+                  <option value="false">Not Attended</option>
                 </select>
-                <button
-                  onClick={handleAddGradeAttendance}
-                  className={studentsGroupStyles.addButton}
-                >
-                  Добавить оценку и присутствие
+                <button onClick={handleAddGradeAttendance} className={studentsGroupStyles.addButton}>
+                  Add Grade and Attendance
                 </button>
                 {editGradeId !== null && (
                   <>
@@ -486,21 +469,20 @@ const StudentsOfGroup: React.FC = () => {
                       type="number"
                       value={editGrade}
                       onChange={(e) => setEditGrade(Number(e.target.value))}
-                      className={studentsGroupStyles.inputField}
-                      placeholder="Оценка"
+                      placeholder="Grade"
                     />
                     <select
                       value={editHasAttended}
                       onChange={(e) => setEditHasAttended(e.target.value === 'true')}
                     >
-                      <option value="true">Присутствует</option>
-                      <option value="false">Отсутствует</option>
+                      <option value="true">Attended</option>
+                      <option value="false">Not Attended</option>
                     </select>
                     <button
                       onClick={() => handleUpdateGradeAttendance(editGradeId)}
                       className={studentsGroupStyles.updateButton}
                     >
-                      Изменить оценку и присутствие
+                      Update Grade and Attendance
                     </button>
                   </>
                 )}
@@ -509,34 +491,32 @@ const StudentsOfGroup: React.FC = () => {
           </div>
         ) : (
           <div>
-            <h2>Семестровые оценки</h2>
+            <h2>Semester Grades</h2>
             {renderSemesterGrades()}
             {isProfessor && (
               <>
                 <input
                   type="text"
-                  value={newSemesterGrade}
-                  onChange={(e) => setNewSemesterGrade(e.target.value)}
-                  className={studentsGroupStyles.inputField}
-                  placeholder="Оценка"
+                  value={newGrade}
+                  onChange={(e) => setNewGrade(Number(e.target.value))}
+                  placeholder="Grade"
                 />
                 <button onClick={handleAddSemesterGrade} className={studentsGroupStyles.addButton}>
-                  Добавить семестровую оценку
+                  Add Semester Grade
                 </button>
-                {editSemesterGradeId !== null && (
+                {editGradeId !== null && (
                   <>
                     <input
                       type="text"
-                      value={editSemesterGrade}
-                      onChange={(e) => setEditSemesterGrade(e.target.value)}
-                      className={studentsGroupStyles.inputField}
-                      placeholder="Оценка"
+                      value={editGrade}
+                      onChange={(e) => setEditGrade(Number(e.target.value))}
+                      placeholder="Grade"
                     />
                     <button
-                      onClick={() => handleUpdateSemesterGrade(editSemesterGradeId)}
+                      onClick={() => handleUpdateSemesterGrade(editGradeId)}
                       className={studentsGroupStyles.updateButton}
                     >
-                      Изменить семестровую оценку
+                      Update Semester Grade
                     </button>
                   </>
                 )}
@@ -547,6 +527,7 @@ const StudentsOfGroup: React.FC = () => {
       </div>
     </>
   );
+  
 };
 
 export default StudentsOfGroup;

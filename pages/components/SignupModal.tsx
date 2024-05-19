@@ -51,12 +51,12 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
     <div className={styles.modal}>
       <div className={styles.modalContent}>
         <span className={styles.close} onClick={onClose}>&times;</span>
-        <h2>Sign Up</h2>
+        <h3>Регистрация</h3>
         <input
           type="text"
           className={styles.inputFields}
           name="username"
-          placeholder="Username"
+          placeholder="Имя пользователя"
           value={formData.username}
           onChange={handleChange}
         />
@@ -64,7 +64,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           type="password"
           className={styles.inputFields}
           name="password"
-          placeholder="Password"
+          placeholder="Пароль"
           value={formData.password}
           onChange={handleChange}
         />
@@ -72,7 +72,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           type="text"
           className={styles.inputFields}
           name="firstname"
-          placeholder="First Name"
+          placeholder="Имя"
           value={formData.firstname}
           onChange={handleChange}
         />
@@ -80,7 +80,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           type="text"
           className={styles.inputFields}
           name="lastname"
-          placeholder="Last Name"
+          placeholder="Фамилия"
           value={formData.lastname}
           onChange={handleChange}
         />
@@ -96,7 +96,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
         <input
             type="text"
             name="phone_number"
-            placeholder="Phone Number"
+            placeholder="Номер телефона"
             value={formData.phone_number}
             onChange={handleChange}
           />
@@ -105,31 +105,15 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           type="text"
           className={styles.inputFields}
           name="group_id"
-          placeholder="Group ID"
+          placeholder="ID группы"
           value={formData.group_id}
           onChange={handleChange}
         />
-        <label>
-          <input
-            type="checkbox"
-            name="is_professor"
-            checked={formData.is_professor}
-            onChange={handleChange}
-          /> Professor
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="is_admin"
-            checked={formData.is_admin}
-            onChange={handleChange}
-          /> Admin
-        </label>
         <input
           type="text"
           className={styles.inputFields}
           name="sex"
-          placeholder="Sex"
+          placeholder="Пол"
           value={formData.sex}
           onChange={handleChange}
         />
@@ -137,11 +121,29 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           type="date"
           className={styles.inputFields}
           name="birthdate"
-          placeholder="Birthdate"
+          placeholder="Дата рождения"
           value={formData.birthdate}
           onChange={handleChange}
         />
-        <button className={styles.button} onClick={handleSignup}>Sign Up</button>
+        <label>
+        Профессор?
+          <input
+            type="checkbox"
+            name="is_professor"
+            checked={formData.is_professor}
+            onChange={handleChange}
+          /> 
+        </label>
+        <label>
+        Админ?
+          <input
+            type="checkbox"
+            name="is_admin"
+            checked={formData.is_admin}
+            onChange={handleChange}
+          /> 
+        </label>
+        <button className={styles.button} onClick={handleSignup}>Регистрация</button>
       </div>
     </div>
   );

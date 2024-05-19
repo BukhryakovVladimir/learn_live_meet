@@ -33,22 +33,22 @@ const LoginModal = ({ onClose }: { onClose: () => void }) => {
     <div className={styles.modal}>
       <div className={styles.modalContent}>
         <span className={styles.close} onClick={onClose}>&times;</span>
-        <h2>Login</h2>
+        <h3>Войти</h3>
         <input
           type="text"
           className={styles.inputFields}
-          placeholder="Username"
+          placeholder="Имя пользователя"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
           className={styles.inputFields}
-          placeholder="Password"
+          placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button className={styles.button} onClick={handleLogin}>Login</button>
+        <button className={styles.button} onClick={handleLogin}>Войти</button>
       </div>
     </div>
   );

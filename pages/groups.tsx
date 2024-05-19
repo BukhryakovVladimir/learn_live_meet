@@ -120,29 +120,37 @@ const Groups: React.FC = () => {
         <h1>Группы</h1>
         <div className={groupsStyles.groupsListContainer}>
           <ul className={groupsStyles.groupsList}>
-            {groups.map(group => (
-              <li
-                key={group.id}
-                className={groupsStyles.groupItem}
-                
-              >
+            {groups.map((group) => (
+              <li key={group.id} className={groupsStyles.groupItem}>
                 <a
                   onClick={() => router.push(`/students-of-a-group/${group.id}`)}
                   href="#"
                   className={groupsStyles.groupLink}
-                >{group.group_name}</a>
-                
+                >
+                  {group.group_name}
+                </a>
+
                 {isAdmin && (
                   <>
-                    <button className={groupsStyles.editButton} onClick={(e) => {
-                      e.stopPropagation();
-                      setEditGroupId(group.id);
-                      setEditGroupName(group.group_name);
-                    }}>Изменить</button>
-                    <button className={groupsStyles.deleteButton} onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteGroup(group.id);
-                    }}>Удалить</button>
+                    <button
+                      className={groupsStyles.editButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditGroupId(group.id);
+                        setEditGroupName(group.group_name);
+                      }}
+                    >
+                      Изменить
+                    </button>
+                    <button
+                      className={groupsStyles.deleteButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteGroup(group.id);
+                      }}
+                    >
+                      Удалить
+                    </button>
                   </>
                 )}
               </li>
@@ -158,7 +166,9 @@ const Groups: React.FC = () => {
               onChange={(e) => setNewGroupName(e.target.value)}
               className={groupsStyles.inputField}
             />
-            <button onClick={handleAddGroup} className={groupsStyles.addButton}>Добавить</button>
+            <button onClick={handleAddGroup} className={groupsStyles.addButton}>
+              Добавить
+            </button>
 
             {editGroupId !== null && (
               <div>
@@ -169,7 +179,9 @@ const Groups: React.FC = () => {
                   onChange={(e) => setEditGroupName(e.target.value)}
                   className={groupsStyles.inputField}
                 />
-                <button onClick={handleUpdateGroup} className={groupsStyles.updateButton}>Изменить</button>
+                <button onClick={handleUpdateGroup} className={groupsStyles.updateButton}>
+                  Изменить
+                </button>
               </div>
             )}
           </div>

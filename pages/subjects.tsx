@@ -29,7 +29,7 @@ const Subjects: React.FC = () => {
         setIsAdmin(data.is_admin);
         setIsProfessor(data.is_professor);
 
-        if (data.is_admin || data.is_professor) {
+        if (data.is_admin) {
           fetchSubjects('http://localhost:3000/api/list-subjects');
         } else {
           fetchSubjects('http://localhost:3000/api/list-current-user-subjects');
@@ -127,9 +127,7 @@ const Subjects: React.FC = () => {
           <ul className={subjectsStyles.subjectsList}>
             {subjects.map((subject) => (
               <li key={subject.id} className={subjectsStyles.subjectItem}>
-                <Link href={`/rooms-of-a-subject/${subject.id}`}>
-                  {subject.subject_name}
-                </Link>
+                <Link href={`/rooms-of-a-subject/${subject.id}`}>{subject.subject_name}</Link>
                 {isAdmin && (
                   <>
                     <button
