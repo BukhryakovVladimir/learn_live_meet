@@ -8,9 +8,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <DefaultSeo
-        title="LiveKit Meet | Conference app build with LiveKit Open Source"
+        title="Образовательный сервис"
         titleTemplate="%s"
-        defaultTitle="LiveKit Meet | Conference app build with LiveKit open source"
+        defaultTitle="Образовательный сервис"
         description="LiveKit is an open source WebRTC project that gives you everything needed to build scalable and real-time audio and/or video experiences in your applications."
         twitter={{
           handle: '@livekitted',
