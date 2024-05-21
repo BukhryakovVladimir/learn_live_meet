@@ -71,11 +71,14 @@ const StudentsOfGroup: React.FC = () => {
   useEffect(() => {
     const fetchUserRoleAndStudents = async () => {
       try {
-        const response = await fetch(`http://${config.serverIP}:3000/api/check-is-admin-or-professor`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+        const response = await fetch(
+          `http://${config.serverIP}:3000/api/check-is-admin-or-professor`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          },
+        );
 
         const data = await response.json();
         setIsProfessor(data.is_professor);
@@ -271,16 +274,19 @@ const StudentsOfGroup: React.FC = () => {
   const handleAddSemesterGrade = async () => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
-        const response = await fetch(`http://${config.serverIP}:3000/api/insert-total-grade-of-a-student`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            student_id: selectedStudentId,
-            subject_id: selectedSubjectId,
-            grade: newSemesterGrade,
-          }),
-        });
+        const response = await fetch(
+          `http://${config.serverIP}:3000/api/insert-total-grade-of-a-student`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              student_id: selectedStudentId,
+              subject_id: selectedSubjectId,
+              grade: newSemesterGrade,
+            }),
+          },
+        );
 
         if (response.ok) {
           fetchSemesterGrades(selectedSubjectId);
@@ -295,17 +301,20 @@ const StudentsOfGroup: React.FC = () => {
   const handleUpdateSemesterGrade = async (id: number) => {
     if (isProfessor && selectedSubjectId !== null && selectedStudentId) {
       try {
-        const response = await fetch(`http://${config.serverIP}:3000/api/update-total-grade-of-a-student`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            id,
-            student_id: selectedStudentId,
-            subject_id: selectedSubjectId,
-            grade: editSemesterGrade,
-          }),
-        });
+        const response = await fetch(
+          `http://${config.serverIP}:3000/api/update-total-grade-of-a-student`,
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              id,
+              student_id: selectedStudentId,
+              subject_id: selectedSubjectId,
+              grade: editSemesterGrade,
+            }),
+          },
+        );
 
         if (response.ok) {
           fetchSemesterGrades(selectedSubjectId);
@@ -418,36 +427,39 @@ const StudentsOfGroup: React.FC = () => {
         <h1>Студенты группы: {groupId}</h1>
         <div>
           <label htmlFor="student-select">Студент:</label>
-          <select
-            id="student-select"
-            value={selectedStudentId || ''}
-            onChange={(e) => setSelectedStudentId(Number(e.target.value))}
-          >
-            {students &&
-              students.map(
-                (
-                  student, // Add a check to ensure `students` is an array
-                ) => (
-                  <option key={student.ID} value={student.ID}>
-                    {student.firstName} {student.lastName}
-                  </option>
-                ),
-              )}
-          </select>
+          {students !== null ? (
+            <select
+              id="student-select"
+              value={selectedStudentId || ''}
+              onChange={(e) => setSelectedStudentId(Number(e.target.value))}
+            >
+              {students.map((student) => (
+                <option key={student.ID} value={student.ID}>
+                  {student.firstName} {student.lastName}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p>Нет студентов</p>
+          )}
         </div>
         <div>
           <label htmlFor="subject-select">Дисциплина:</label>
-          <select
-            id="subject-select"
-            value={selectedSubjectId || ''}
-            onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
-          >
-            {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.subject_name}
-              </option>
-            ))}
-          </select>
+          {subjects !== null ? (
+            <select
+              id="subject-select"
+              value={selectedSubjectId || ''}
+              onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
+            >
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.subject_name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p>Нет дисциплин</p>
+          )}
         </div>
         <div>
           <button onClick={() => setCurrentView('grades-and-attendance')}>
