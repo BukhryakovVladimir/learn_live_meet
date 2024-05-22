@@ -21,29 +21,29 @@
   max-width: 900px;
 }
 
-.roomsListContainer {
+.roomsList {
   max-height: 400px; /* Adjust the maximum height as needed */
   overflow: auto;
 }
 
-.roomsListContainer::-webkit-scrollbar {
+.roomsList::-webkit-scrollbar {
   width: 5px; /* Width of the scrollbar */
   height: 10px; /* Height of the scrollbar */
 }
 
-.roomsListContainer::-webkit-scrollbar-thumb {
+.roomsList::-webkit-scrollbar-thumb {
   background-color: #ccc; /* Color of the scrollbar thumb */
 }
 
-.roomsListContainer::-webkit-scrollbar-thumb:hover {
+.roomsList::-webkit-scrollbar-thumb:hover {
   background-color: #aaa; /* Color of the scrollbar thumb on hover */
 }
 
-.roomsListContainer::-webkit-scrollbar-track {
+.roomsList::-webkit-scrollbar-track {
   background-color: transparent; /* Color of the scrollbar track */
 }
 
-.roomsListContainer::-webkit-scrollbar-corner {
+.roomsList::-webkit-scrollbar-corner {
   background-color: transparent; /* Color of the scrollbar corner */
 }
 
