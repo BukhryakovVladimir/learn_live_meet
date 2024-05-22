@@ -18,6 +18,12 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
   });
 
   const handleSignup = async () => {
+    const adjustedFormData = {
+      ...formData,
+      birthdate: formData.birthdate ? `${formData.birthdate}T00:00:00Z` : '',
+      group_id: Number(formData.group_id) // Ensure group_id is a number
+    };
+
     try {
       const response = await fetch(`http://${config.serverIP}:3000/api/signup`, {
         method: 'POST',
@@ -25,7 +31,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(adjustedFormData)
       });
 
       if (response.ok) {
@@ -94,7 +100,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           onChange={handleChange}
         />
         <div className={styles.inputFields}>
-        <input
+          <input
             type="text"
             name="phone_number"
             placeholder="Номер телефона"
@@ -127,7 +133,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           onChange={handleChange}
         />
         <label>
-        Профессор?
+          Профессор?
           <input
             type="checkbox"
             name="is_professor"
@@ -136,7 +142,7 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
           /> 
         </label>
         <label>
-        Админ?
+          Админ?
           <input
             type="checkbox"
             name="is_admin"
@@ -151,4 +157,3 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
 };
 
 export default SignupModal;
-
