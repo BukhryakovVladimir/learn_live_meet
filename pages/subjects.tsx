@@ -12,7 +12,7 @@ interface Subject {
 const Subjects: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isProfessor, setIsProfessor] = useState(false);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<Subject[] | null>(null);
   const [newSubjectName, setNewSubjectName] = useState('');
   const [editSubjectId, setEditSubjectId] = useState<number | null>(null);
   const [editSubjectName, setEditSubjectName] = useState('');
@@ -30,11 +30,11 @@ const Subjects: React.FC = () => {
         setIsAdmin(data.is_admin);
         setIsProfessor(data.is_professor);
 
-        if (data.is_admin) {
-          fetchSubjects(`http://${config.serverIP}:3000/api/list-subjects`);
-        } else {
-          fetchSubjects(`http://${config.serverIP}:3000/api/list-current-user-subjects`);
-        }
+        const url = data.is_admin 
+          ? `http://${config.serverIP}:3000/api/list-subjects` 
+          : `http://${config.serverIP}:3000/api/list-current-user-subjects`;
+
+        fetchSubjects(url);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
@@ -49,7 +49,7 @@ const Subjects: React.FC = () => {
         });
 
         const data = await response.json();
-        setSubjects(data);
+        setSubjects(data.length ? data : null);
       } catch (error) {
         console.error('Error fetching subjects:', error);
       }
@@ -70,7 +70,6 @@ const Subjects: React.FC = () => {
       if (response.ok) {
         await response.json();
         setNewSubjectName('');
-        localStorage.setItem('currentView', '/Subjects'); // Store the current view in local storage
         window.location.reload(); // Reload the page
       }
     } catch (error) {
@@ -92,7 +91,6 @@ const Subjects: React.FC = () => {
           await response.json();
           setEditSubjectId(null);
           setEditSubjectName('');
-          localStorage.setItem('currentView', '/Subjects'); // Store the current view in local storage
           window.location.reload(); // Reload the page
         }
       } catch (error) {
@@ -111,7 +109,6 @@ const Subjects: React.FC = () => {
 
       if (response.ok) {
         await response.json();
-        localStorage.setItem('currentView', '/Subjects'); // Store the current view in local storage
         window.location.reload(); // Reload the page
       }
     } catch (error) {
@@ -124,61 +121,66 @@ const Subjects: React.FC = () => {
       <Header />
       <div className={subjectsStyles.subjectsContainer}>
         <h1>Занятия</h1>
-        <div className={subjectsStyles.subjectsListContainer}>
-          <ul className={subjectsStyles.subjectsList}>
-            {subjects.map((subject) => (
-              <li key={subject.id} className={subjectsStyles.subjectItem}>
-                <Link href={`/rooms-of-a-subject/${subject.id}`}>{subject.subject_name}</Link>
-                {isAdmin && (
-                  <>
-                    <button
-                      className={subjectsStyles.editButton}
-                      onClick={() => {
-                        setEditSubjectId(subject.id);
-                        setEditSubjectName(subject.subject_name);
-                      }}
-                    >
-                      Изменить
-                    </button>
-                    <button
-                      className={subjectsStyles.deleteButton}
-                      onClick={() => handleDeleteSubject(subject.id)}
-                    >
-                      Удалить
-                    </button>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-        {isAdmin && (
+        {subjects ? (
+          <div className={subjectsStyles.subjectsListContainer}>
+            <ul className={subjectsStyles.subjectsList}>
+              {subjects.map((subject) => (
+                <li key={subject.id} className={subjectsStyles.subjectItem}>
+                  <Link href={`/rooms-of-a-subject/${subject.id}`}>{subject.subject_name}</Link>
+                  {isAdmin && (
+                    <>
+                      <button
+                        className={subjectsStyles.editButton}
+                        onClick={() => {
+                          setEditSubjectId(subject.id);
+                          setEditSubjectName(subject.subject_name);
+                        }}
+                      >
+                        Изменить
+                      </button>
+                      <button
+                        className={subjectsStyles.deleteButton}
+                        onClick={() => handleDeleteSubject(subject.id)}
+                      >
+                        Удалить
+                      </button>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
           <div>
-            <h2>Добавить дисциплину</h2>
-            <input
-              type="text"
-              value={newSubjectName}
-              onChange={(e) => setNewSubjectName(e.target.value)}
-              className={subjectsStyles.inputField}
-            />
-            <button onClick={handleAddSubject} className={subjectsStyles.addButton}>
-              Добавить
-            </button>
-
-            {editSubjectId !== null && (
+            <p>Нет доступных дисциплин.</p>
+            {isAdmin && (
               <div>
-                <h2>Изменить дисциплину</h2>
+                <h2>Добавить дисциплину</h2>
                 <input
                   type="text"
-                  value={editSubjectName}
-                  onChange={(e) => setEditSubjectName(e.target.value)}
+                  value={newSubjectName}
+                  onChange={(e) => setNewSubjectName(e.target.value)}
                   className={subjectsStyles.inputField}
                 />
-                <button onClick={handleUpdateSubject} className={subjectsStyles.updateButton}>
-                  Изменить
+                <button onClick={handleAddSubject} className={subjectsStyles.addButton}>
+                  Добавить
                 </button>
               </div>
             )}
+          </div>
+        )}
+        {isAdmin && editSubjectId !== null && (
+          <div>
+            <h2>Изменить дисциплину</h2>
+            <input
+              type="text"
+              value={editSubjectName}
+              onChange={(e) => setEditSubjectName(e.target.value)}
+              className={subjectsStyles.inputField}
+            />
+            <button onClick={handleUpdateSubject} className={subjectsStyles.updateButton}>
+              Изменить
+            </button>
           </div>
         )}
       </div>
