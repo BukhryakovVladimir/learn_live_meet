@@ -11,7 +11,7 @@ interface Group {
 
 const Groups: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [groups, setGroups] = useState<Group[] | null>(null);
   const [newGroupName, setNewGroupName] = useState('');
   const [editGroupId, setEditGroupId] = useState<number | null>(null);
   const [editGroupName, setEditGroupName] = useState('');
@@ -44,7 +44,7 @@ const Groups: React.FC = () => {
         });
 
         const data = await response.json();
-        setGroups(data);
+        setGroups(data.length ? data : null);
       } catch (error) {
         console.error('Error fetching groups:', error);
       }
@@ -65,7 +65,6 @@ const Groups: React.FC = () => {
       if (response.ok) {
         await response.json();
         setNewGroupName('');
-        localStorage.setItem('currentView', '/Groups');
         window.location.reload();
       }
     } catch (error) {
@@ -87,7 +86,6 @@ const Groups: React.FC = () => {
           await response.json();
           setEditGroupId(null);
           setEditGroupName('');
-          localStorage.setItem('currentView', '/Groups');
           window.location.reload();
         }
       } catch (error) {
@@ -106,7 +104,6 @@ const Groups: React.FC = () => {
 
       if (response.ok) {
         await response.json();
-        localStorage.setItem('currentView', '/Groups');
         window.location.reload();
       }
     } catch (error) {
@@ -119,72 +116,77 @@ const Groups: React.FC = () => {
       <Header />
       <div className={groupsStyles.groupsContainer}>
         <h1>Группы</h1>
-        <div className={groupsStyles.groupsListContainer}>
-          <ul className={groupsStyles.groupsList}>
-            {groups.map((group) => (
-              <li key={group.id} className={groupsStyles.groupItem}>
-                <a
-                  onClick={() => router.push(`/students-of-a-group/${group.id}`)}
-                  href="#"
-                  className={groupsStyles.groupLink}
-                >
-                  {group.group_name}
-                </a>
+        {groups ? (
+          <div className={groupsStyles.groupsListContainer}>
+            <ul className={groupsStyles.groupsList}>
+              {groups.map((group) => (
+                <li key={group.id} className={groupsStyles.groupItem}>
+                  <a
+                    onClick={() => router.push(`/students-of-a-group/${group.id}`)}
+                    href="#"
+                    className={groupsStyles.groupLink}
+                  >
+                    {group.group_name}
+                  </a>
 
-                {isAdmin && (
-                  <>
-                    <button
-                      className={groupsStyles.editButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditGroupId(group.id);
-                        setEditGroupName(group.group_name);
-                      }}
-                    >
-                      Изменить
-                    </button>
-                    <button
-                      className={groupsStyles.deleteButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteGroup(group.id);
-                      }}
-                    >
-                      Удалить
-                    </button>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-        {isAdmin && (
+                  {isAdmin && (
+                    <>
+                      <button
+                        className={groupsStyles.editButton}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditGroupId(group.id);
+                          setEditGroupName(group.group_name);
+                        }}
+                      >
+                        Изменить
+                      </button>
+                      <button
+                        className={groupsStyles.deleteButton}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteGroup(group.id);
+                        }}
+                      >
+                        Удалить
+                      </button>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
           <div>
-            <h2>Добавить группу</h2>
-            <input
-              type="text"
-              value={newGroupName}
-              onChange={(e) => setNewGroupName(e.target.value)}
-              className={groupsStyles.inputField}
-            />
-            <button onClick={handleAddGroup} className={groupsStyles.addButton}>
-              Добавить
-            </button>
-
-            {editGroupId !== null && (
+            <p>Нет доступных групп.</p>
+            {isAdmin && (
               <div>
-                <h2>Изменить группу</h2>
+                <h2>Добавить группу</h2>
                 <input
                   type="text"
-                  value={editGroupName}
-                  onChange={(e) => setEditGroupName(e.target.value)}
+                  value={newGroupName}
+                  onChange={(e) => setNewGroupName(e.target.value)}
                   className={groupsStyles.inputField}
                 />
-                <button onClick={handleUpdateGroup} className={groupsStyles.updateButton}>
-                  Изменить
+                <button onClick={handleAddGroup} className={groupsStyles.addButton}>
+                  Добавить
                 </button>
               </div>
             )}
+          </div>
+        )}
+        {isAdmin && editGroupId !== null && (
+          <div>
+            <h2>Изменить группу</h2>
+            <input
+              type="text"
+              value={editGroupName}
+              onChange={(e) => setEditGroupName(e.target.value)}
+              className={groupsStyles.inputField}
+            />
+            <button onClick={handleUpdateGroup} className={groupsStyles.updateButton}>
+              Изменить
+            </button>
           </div>
         )}
       </div>
